@@ -1,0 +1,162 @@
+<html>
+
+<head>
+  <title>
+    catch me(JavaScript)
+  </title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1,maximum-scale=1">
+  <style>
+    html,body,div,form,input,span,a{
+      padding: 0;
+      margin: 0;
+    }
+    .father{
+        /* background-color: navy; */
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        position: absolute;
+        /* font-size: 500px; */
+    }
+    .son{
+        /* background-color: red; */
+        height: fit-content;
+        width:fit-content;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        margin: auto;
+        font-size: 150px;
+    }
+</style>
+
+  <script>
+    /* 
+    let countupVal, updateVal;
+    let count = 0;
+    let countup = function(){
+       count = count + 1;
+       document.getElementById("timer").innerHTML = count;
+     }
+     countupVal = setInterval(countup, 1000); // 1秒ごとに countupを呼ぶ
+  */
+
+    let Human = function () { // Human のコンストラクタ関数
+      this.image = new Image();
+      this.image.style.position = "fixed";
+    }
+
+    let Catcher = function () { // Player のコンストラクタ関数
+      Human.apply(this, arguments);
+      this.x = 0;
+      this.y = 0;
+      this.image.src = "catcher.png";
+    }
+
+    let Runner = function () { // Enemy のコンストラクタ関数
+      Human.apply(this, arguments);
+      this.x = Math.floor(Math.random() * window.innerWidth * 0.8 + window.innerWidth * 0.1 - this.image.width);
+      this.y = Math.floor(Math.random() * window.innerHeight * 0.8 + window.innerHeight * 0.1 - this.image.height);
+      // this.dx = Math.floor( Math.random() * 11 ) - 5;
+      // this.dy = Math.floor( Math.random() * 11 ) - 5;
+      this.image.src = "humanpicto.png";
+    }
+
+    Catcher.prototype = new Human;
+    Runner.prototype = new Human;
+
+    Runner.prototype.update = function (catcher) {
+
+      if (this.x > window.innerWidth * 0.9) {
+        this.dxAvoidWall = Math.log(this.x - 0.9 * window.innerWidth + 1) / Math.log(0.5);
+      } else if (this.x < window.innerWidth * 0.1) {
+        this.dxAvoidWall = Math.log(0.1 * window.innerWidth - this.x) / Math.log(2);
+      } else {
+        this.dxAvoidWall = 0;
+      }
+
+      if (this.y > window.innerHeight * 0.9) {
+        this.dyAvoidWall = Math.log(this.y - 0.9 * window.innerHeight + 1) / Math.log(0.5);
+      } else if (this.y < window.innerHeight * 0.1) {
+        this.dyAvoidWall = Math.log(0.1 * window.innerHeight - this.y) / Math.log(2);
+      } else {
+        this.dyAvoidWall = 0;
+      }
+
+      // catherとrunnerの距離を計算
+      distance_x = this.x - catcher.x + (Math.random() * 100 - 50);
+      distance_y = this.y - catcher.y + (Math.random() * 100 - 50);
+      this.distance = distance_x**2 + distance_y**2;
+      
+      // 距離が近いほどcatherからrunnerが早く逃げる
+      this.dx = distance_x / Math.pow(this.distance, 1.5) * 100000;
+      this.dy = distance_y / Math.pow(this.distance, 1.5) * 100000;
+      if (Math.abs(this.dx) < 0.9){this.dx = 0;}
+      if (Math.abs(this.dy) < 0.9){this.dy = 0;}
+
+      this.x = this.x + this.dx + this.dxAvoidWall;
+      this.y = this.y + this.dy + this.dyAvoidWall;
+      
+      this.image.style.left = this.x + "px";
+      this.image.style.top = this.y + "px";
+      /* if((Math.abs(player.x - this.x) < player.image.width) && (Math.abs(player.y - this.y) < player.image.height)){
+        gameover();
+      } */
+    }
+
+    let catcher;
+    let runner = new Array(15);
+
+    window.onload = function () {　// ブラウザにコンテンツがロードされたときに1度だけ呼ばれる関数
+      catcher = new Catcher();
+      for(let i = 0; i < runner.length; i++){
+        runner[i] = new Runner();
+      }
+
+
+      document.body.appendChild(catcher.image);
+      for(let i = 0; i < runner.length; i++){
+        document.body.appendChild(runner[i].image);
+      }
+      
+
+      // マウスが移動したときに MouseMove 関数が呼ばれるようにイベントリスナを設定
+      if (document.addEventListener) {
+        document.addEventListener("mousemove", MouseMove);
+      } else if (document.attachEvent) {
+        document.attachEvent("onmousemove", MouseMove);
+      }
+    }
+
+    function MouseMove(e) {
+      catcher.x = (e.clientX - catcher.image.width / 2);
+      catcher.y = (e.clientY - catcher.image.height / 2);
+      catcher.image.style.left = catcher.x + "px";
+      catcher.image.style.top = catcher.y + "px";
+    }
+
+    let update = function () { // 画像表示のアップデート
+      for(let i = 0; i < runner.length; i++){
+        runner[i].update(catcher);
+      }
+    }
+    updateVal = setInterval(update, 10); // 関数updateを10msごとに呼び出す．
+
+    /* function gameover() {
+      clearInterval(countupVal); // 関数countupを一定時間ごとに呼び出していたのを止める．
+      clearInterval(updateVal); // 関数updateを一定時間ごとに呼び出していたのを止める．
+    } */
+
+  </script>
+</head>
+
+<body bgcolor="white">
+  <div class="father">
+    <div id="title" class="son">catch me</div>
+  </div>
+</body>
+
+</html>
